@@ -2,6 +2,7 @@ package provider
 
 import (
 	"context"
+	"log"
 
 	"github.com/hashicorp/terraform-plugin-framework/diag"
 	"github.com/hashicorp/terraform-plugin-framework/tfsdk"
@@ -112,14 +113,13 @@ func (r sqsResource) Read(ctx context.Context, req tfsdk.ReadResourceRequest, re
 		return
 	}
 
-	// If applicable, this is a great opportunity to initialize any necessary
-	// provider client data and make a call using it.
-	// example, err := d.provider.client.ReadExample(...)
-	// if err != nil {
-	//     resp.Diagnostics.AddError("Client Error", fmt.Sprintf("Unable to read example, got error: %s", err))
-	//     return
-	// }
-	//settings := r.provider.client.GetAppConfig(ctx)
+	appConfig, err := r.provider.client.GetAppConfig(ctx)
+	if err != nil {
+		log.Fatal(err.Error())
+	}
+	data.SqsUrl = types.String{Value: appConfig.App.SqsURL}
+	data.SqsAccessKey = types.String{Value: appConfig.App.SqsKey}
+	data.SqsSecretKey = types.String{Value: appConfig.App.SqsSecret}
 
 	diags = resp.State.Set(ctx, &data)
 	resp.Diagnostics.Append(diags...)
@@ -156,14 +156,6 @@ func (r sqsResource) Delete(ctx context.Context, req tfsdk.DeleteResourceRequest
 	if resp.Diagnostics.HasError() {
 		return
 	}
-
-	// If applicable, this is a great opportunity to initialize any necessary
-	// provider client data and make a call using it.
-	// example, err := d.provider.client.DeleteExample(...)
-	// if err != nil {
-	//     resp.Diagnostics.AddError("Client Error", fmt.Sprintf("Unable to delete example, got error: %s", err))
-	//     return
-	// }
 
 	// set your sqsResource queue details
 	settings := &stream.AppSettings{
