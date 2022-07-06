@@ -3,12 +3,11 @@ package provider
 import (
 	"context"
 	"fmt"
+	stream "github.com/GetStream/stream-chat-go/v5"
 	"github.com/hashicorp/terraform-plugin-framework/diag"
 	"github.com/hashicorp/terraform-plugin-framework/tfsdk"
 	"github.com/hashicorp/terraform-plugin-framework/types"
-	"log"
-
-	stream "github.com/GetStream/stream-chat-go/v5"
+	"github.com/hashicorp/terraform-plugin-log/tflog"
 )
 
 // Ensure provider defined types fully satisfy framework interfaces
@@ -74,7 +73,7 @@ func (p *provider) Configure(ctx context.Context, req tfsdk.ConfigureProviderReq
 	// as authentication or logging, this is a great opportunity to do so.
 	client, err := stream.NewClient(data.ApiKey.Value, data.ApiSecret.Value)
 	if err != nil {
-		log.Fatal(err.Error())
+		tflog.Error(ctx, err.Error())
 	}
 	p.client = *client
 

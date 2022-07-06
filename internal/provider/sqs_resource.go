@@ -2,13 +2,12 @@ package provider
 
 import (
 	"context"
+	stream "github.com/GetStream/stream-chat-go/v5"
 	"github.com/hashicorp/terraform-plugin-framework/diag"
 	"github.com/hashicorp/terraform-plugin-framework/tfsdk"
 	"github.com/hashicorp/terraform-plugin-framework/types"
 	"github.com/hashicorp/terraform-plugin-go/tftypes"
 	"github.com/hashicorp/terraform-plugin-log/tflog"
-
-	stream "github.com/GetStream/stream-chat-go/v5"
 )
 
 // Ensure provider defined types fully satisfy framework interfaces
@@ -80,6 +79,7 @@ func (r sqsResource) Create(ctx context.Context, req tfsdk.CreateResourceRequest
 		return
 	}
 
+	tflog.Debug("Creating the sqs link on the GetStream.io...")
 	// set your sqsResource queue details
 	settings := &stream.AppSettings{
 		SqsURL:    data.SqsUrl.Value,
@@ -87,10 +87,11 @@ func (r sqsResource) Create(ctx context.Context, req tfsdk.CreateResourceRequest
 		SqsSecret: data.SqsSecretKey.Value,
 	}
 	r.provider.client.UpdateAppSettings(ctx, settings)
+	tflog.Debug("SQS link on the GetStream.io created.")
 
 	// For the purposes of this example code, hardcoding a response value to
 	// save into the Terraform state.
-	data.Id = types.String{Value: "example-id"}
+	data.Id = types.String{Value: "getstreamio-sqs-1"}
 
 	// write logs using the tflog package
 	// see https://pkg.go.dev/github.com/hashicorp/terraform-plugin-log/tflog
@@ -111,14 +112,6 @@ func (r sqsResource) Read(ctx context.Context, req tfsdk.ReadResourceRequest, re
 		return
 	}
 
-	//appConfig, err := r.provider.client.GetAppConfig(ctx)
-	//if err != nil {
-	//	log.Fatal(err.Error())
-	//}
-	//data.SqsUrl = types.String{Value: appConfig.App.SqsURL}
-	//data.SqsAccessKey = types.String{Value: appConfig.App.SqsKey}
-	//data.SqsSecretKey = types.String{Value: appConfig.App.SqsSecret}
-
 	diags = resp.State.Set(ctx, &data)
 	resp.Diagnostics.Append(diags...)
 }
@@ -134,12 +127,14 @@ func (r sqsResource) Update(ctx context.Context, req tfsdk.UpdateResourceRequest
 	}
 
 	// set your sqsResource queue details
+	tflog.Debug("Creating the sqs link on the GetStream.io...")
 	settings := &stream.AppSettings{
 		SqsURL:    data.SqsUrl.Value,
 		SqsKey:    data.SqsAccessKey.Value,
 		SqsSecret: data.SqsSecretKey.Value,
 	}
 	r.provider.client.UpdateAppSettings(ctx, settings)
+	tflog.Debug("SQS link on the GetStream.io created.")
 
 	diags = resp.State.Set(ctx, &data)
 	resp.Diagnostics.Append(diags...)
@@ -156,12 +151,14 @@ func (r sqsResource) Delete(ctx context.Context, req tfsdk.DeleteResourceRequest
 	}
 
 	// set your sqsResource queue details
+	tflog.Debug("Deleting the sqs link on the GetStream.io...")
 	settings := &stream.AppSettings{
 		SqsURL:    "",
 		SqsKey:    "",
 		SqsSecret: "",
 	}
 	r.provider.client.UpdateAppSettings(ctx, settings)
+	tflog.Debug("SQS link on the GetStream.io deleted.")
 }
 
 func (r sqsResource) ImportState(ctx context.Context, req tfsdk.ImportResourceStateRequest, resp *tfsdk.ImportResourceStateResponse) {

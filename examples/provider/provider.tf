@@ -1,5 +1,5 @@
 provider "getstreamio" {
   # example configuration here
-  apiKey    = "key"
-  apiSecret = "secret"
+  api_key    = "key"
+  api_secret = "secret"
 }
