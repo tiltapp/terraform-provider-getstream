@@ -96,9 +96,9 @@ func (r sqsResource) Create(ctx context.Context, req tfsdk.CreateResourceRequest
 	} else {
 		// For the purposes of this example code, hardcoding a response value to
 		// save into the Terraform state.
-		data.Id = types.String{Value: "getstreamio-sqs-1"}
 		tflog.Debug(ctx, "SQS link on the GetStream.io created.")
 	}
+	data.Id = types.String{Value: "getstreamio-sqs-1"}
 
 	diags = resp.State.Set(ctx, &data)
 	resp.Diagnostics.Append(diags...)
