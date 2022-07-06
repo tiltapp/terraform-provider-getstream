@@ -91,15 +91,14 @@ func (r sqsResource) Create(ctx context.Context, req tfsdk.CreateResourceRequest
 	}
 	_, err := r.provider.client.UpdateAppSettings(ctx, settings)
 	if err != nil {
+		diags.AddError("Error during the SQS creation.", err.Error())
 		tflog.Error(ctx, err.Error())
 	} else {
-		tflog.Debug(ctx, "SQS link on the GetStream.io updated.")
+		// For the purposes of this example code, hardcoding a response value to
+		// save into the Terraform state.
+		data.Id = types.String{Value: "getstreamio-sqs-1"}
+		tflog.Debug(ctx, "SQS link on the GetStream.io created.")
 	}
-	tflog.Debug(ctx, "SQS link on the GetStream.io created.")
-
-	// For the purposes of this example code, hardcoding a response value to
-	// save into the Terraform state.
-	data.Id = types.String{Value: "getstreamio-sqs-1"}
 
 	diags = resp.State.Set(ctx, &data)
 	resp.Diagnostics.Append(diags...)
@@ -141,6 +140,7 @@ func (r sqsResource) Update(ctx context.Context, req tfsdk.UpdateResourceRequest
 	}
 	_, err := r.provider.client.UpdateAppSettings(ctx, settings)
 	if err != nil {
+		diags.AddError("Error during the SQS update.", err.Error())
 		tflog.Error(ctx, err.Error())
 	} else {
 		tflog.Debug(ctx, "SQS link on the GetStream.io updated.")
@@ -163,15 +163,16 @@ func (r sqsResource) Delete(ctx context.Context, req tfsdk.DeleteResourceRequest
 	// set your sqsResource queue details
 	tflog.Debug(ctx, "Deleting the sqs link on the GetStream.io...")
 	settings := &stream.AppSettings{
-		SqsURL:    "",
-		SqsKey:    "",
-		SqsSecret: "",
+		SqsURL:    " ",
+		SqsKey:    " ",
+		SqsSecret: " ",
 	}
 	_, err := r.provider.client.UpdateAppSettings(ctx, settings)
 	if err != nil {
+		diags.AddError("Error during the SQS deletion.", err.Error())
 		tflog.Error(ctx, err.Error())
 	} else {
-		tflog.Debug(ctx, "SQS link on the GetStream.io updated.")
+		tflog.Debug(ctx, "SQS link on the GetStream.io deleted.")
 	}
 }
 
