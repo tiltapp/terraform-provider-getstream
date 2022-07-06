@@ -2,8 +2,6 @@ package provider
 
 import (
 	"context"
-	"log"
-
 	"github.com/hashicorp/terraform-plugin-framework/diag"
 	"github.com/hashicorp/terraform-plugin-framework/tfsdk"
 	"github.com/hashicorp/terraform-plugin-framework/types"
@@ -113,13 +111,13 @@ func (r sqsResource) Read(ctx context.Context, req tfsdk.ReadResourceRequest, re
 		return
 	}
 
-	appConfig, err := r.provider.client.GetAppConfig(ctx)
-	if err != nil {
-		log.Fatal(err.Error())
-	}
-	data.SqsUrl = types.String{Value: appConfig.App.SqsURL}
-	data.SqsAccessKey = types.String{Value: appConfig.App.SqsKey}
-	data.SqsSecretKey = types.String{Value: appConfig.App.SqsSecret}
+	//appConfig, err := r.provider.client.GetAppConfig(ctx)
+	//if err != nil {
+	//	log.Fatal(err.Error())
+	//}
+	//data.SqsUrl = types.String{Value: appConfig.App.SqsURL}
+	//data.SqsAccessKey = types.String{Value: appConfig.App.SqsKey}
+	//data.SqsSecretKey = types.String{Value: appConfig.App.SqsSecret}
 
 	diags = resp.State.Set(ctx, &data)
 	resp.Diagnostics.Append(diags...)
