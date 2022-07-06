@@ -80,13 +80,21 @@ func (r sqsResource) Create(ctx context.Context, req tfsdk.CreateResourceRequest
 	}
 
 	tflog.Debug(ctx, "Creating the sqs link on the GetStream.io...")
+	tflog.Trace(ctx, "URL: "+data.SqsUrl.Value)
+	tflog.Trace(ctx, "AccessKey: "+data.SqsAccessKey.Value)
+	tflog.Trace(ctx, "SecretKey: "+data.SqsSecretKey.Value)
 	// set your sqsResource queue details
 	settings := &stream.AppSettings{
 		SqsURL:    data.SqsUrl.Value,
 		SqsKey:    data.SqsAccessKey.Value,
 		SqsSecret: data.SqsSecretKey.Value,
 	}
-	r.provider.client.UpdateAppSettings(ctx, settings)
+	_, err := r.provider.client.UpdateAppSettings(ctx, settings)
+	if err != nil {
+		tflog.Error(ctx, err.Error())
+	} else {
+		tflog.Debug(ctx, "SQS link on the GetStream.io updated.")
+	}
 	tflog.Debug(ctx, "SQS link on the GetStream.io created.")
 
 	// For the purposes of this example code, hardcoding a response value to
@@ -122,14 +130,21 @@ func (r sqsResource) Update(ctx context.Context, req tfsdk.UpdateResourceRequest
 	}
 
 	// set your sqsResource queue details
-	tflog.Debug(ctx, "Creating the sqs link on the GetStream.io...")
+	tflog.Debug(ctx, "Updating the sqs link on the GetStream.io...")
+	tflog.Trace(ctx, "URL: "+data.SqsUrl.Value)
+	tflog.Trace(ctx, "AccessKey: "+data.SqsAccessKey.Value)
+	tflog.Trace(ctx, "SecretKey: "+data.SqsSecretKey.Value)
 	settings := &stream.AppSettings{
 		SqsURL:    data.SqsUrl.Value,
 		SqsKey:    data.SqsAccessKey.Value,
 		SqsSecret: data.SqsSecretKey.Value,
 	}
-	r.provider.client.UpdateAppSettings(ctx, settings)
-	tflog.Debug(ctx, "SQS link on the GetStream.io created.")
+	_, err := r.provider.client.UpdateAppSettings(ctx, settings)
+	if err != nil {
+		tflog.Error(ctx, err.Error())
+	} else {
+		tflog.Debug(ctx, "SQS link on the GetStream.io updated.")
+	}
 
 	diags = resp.State.Set(ctx, &data)
 	resp.Diagnostics.Append(diags...)
@@ -152,8 +167,12 @@ func (r sqsResource) Delete(ctx context.Context, req tfsdk.DeleteResourceRequest
 		SqsKey:    "",
 		SqsSecret: "",
 	}
-	r.provider.client.UpdateAppSettings(ctx, settings)
-	tflog.Debug(ctx, "SQS link on the GetStream.io deleted.")
+	_, err := r.provider.client.UpdateAppSettings(ctx, settings)
+	if err != nil {
+		tflog.Error(ctx, err.Error())
+	} else {
+		tflog.Debug(ctx, "SQS link on the GetStream.io updated.")
+	}
 }
 
 func (r sqsResource) ImportState(ctx context.Context, req tfsdk.ImportResourceStateRequest, resp *tfsdk.ImportResourceStateResponse) {
