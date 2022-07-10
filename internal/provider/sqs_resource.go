@@ -3,6 +3,7 @@ package provider
 import (
 	"context"
 	stream "github.com/GetStream/stream-chat-go/v5"
+	"github.com/dcarbone/terraform-plugin-framework-utils/validation"
 	"github.com/hashicorp/terraform-plugin-framework/diag"
 	"github.com/hashicorp/terraform-plugin-framework/tfsdk"
 	"github.com/hashicorp/terraform-plugin-framework/types"
@@ -35,6 +36,9 @@ func (t sqsResourceType) GetSchema(ctx context.Context) (tfsdk.Schema, diag.Diag
 				MarkdownDescription: "URL to send messages on the SQS queue",
 				Required:            true,
 				Type:                types.StringType,
+				Validators: []tfsdk.AttributeValidator{
+					validation.IsURL(),
+				},
 			},
 			"sqs_access_key": {
 				MarkdownDescription: "Access key with privileges to send message on the SQS queue",
@@ -91,16 +95,14 @@ func (r sqsResource) Create(ctx context.Context, req tfsdk.CreateResourceRequest
 	}
 	_, err := r.provider.client.UpdateAppSettings(ctx, settings)
 	if err != nil {
-		diags.AddError("Error during the SQS creation.", err.Error())
+		resp.Diagnostics.Append(diag.NewErrorDiagnostic("Error during the SQS creation.", err.Error()))
 		tflog.Error(ctx, err.Error())
-	} else {
-		// For the purposes of this example code, hardcoding a response value to
-		// save into the Terraform state.
-		tflog.Debug(ctx, "SQS link on the GetStream.io created.")
+		return
 	}
-	data.Id = types.String{Value: "getstreamio-sqs-1"}
+	tflog.Debug(ctx, "SQS link on the GetStream.io created.")
 
-	diags = resp.State.Set(ctx, &data)
+	data.Id = types.String{Value: "getstreamio-sqs-1"}
+	diags.Append(resp.State.Set(ctx, &data)...)
 	resp.Diagnostics.Append(diags...)
 }
 
@@ -140,11 +142,12 @@ func (r sqsResource) Update(ctx context.Context, req tfsdk.UpdateResourceRequest
 	}
 	_, err := r.provider.client.UpdateAppSettings(ctx, settings)
 	if err != nil {
-		diags.AddError("Error during the SQS update.", err.Error())
+		resp.Diagnostics.Append(diag.NewErrorDiagnostic("Error during the SQS update.", err.Error()))
 		tflog.Error(ctx, err.Error())
-	} else {
-		tflog.Debug(ctx, "SQS link on the GetStream.io updated.")
+		return
 	}
+
+	tflog.Debug(ctx, "SQS link on the GetStream.io updated.")
 
 	diags = resp.State.Set(ctx, &data)
 	resp.Diagnostics.Append(diags...)
@@ -155,7 +158,6 @@ func (r sqsResource) Delete(ctx context.Context, req tfsdk.DeleteResourceRequest
 
 	diags := req.State.Get(ctx, &data)
 	resp.Diagnostics.Append(diags...)
-
 	if resp.Diagnostics.HasError() {
 		return
 	}
@@ -169,11 +171,11 @@ func (r sqsResource) Delete(ctx context.Context, req tfsdk.DeleteResourceRequest
 	}
 	_, err := r.provider.client.UpdateAppSettings(ctx, settings)
 	if err != nil {
-		diags.AddError("Error during the SQS deletion.", err.Error())
+		resp.Diagnostics.Append(diag.NewErrorDiagnostic("Error during the SQS deletion.", err.Error()))
 		tflog.Error(ctx, err.Error())
-	} else {
-		tflog.Debug(ctx, "SQS link on the GetStream.io deleted.")
+		return
 	}
+	tflog.Debug(ctx, "SQS link on the GetStream.io deleted.")
 }
 
 func (r sqsResource) ImportState(ctx context.Context, req tfsdk.ImportResourceStateRequest, resp *tfsdk.ImportResourceStateResponse) {

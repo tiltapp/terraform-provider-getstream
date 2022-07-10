@@ -16,11 +16,6 @@ var _ tfsdk.Provider = &provider{}
 // provider satisfies the tfsdk.Provider interface and usually is included
 // with all Resource and DataSource implementations.
 type provider struct {
-	// client can contain the upstream provider SDK or HTTP client used to
-	// communicate with the upstream service. Resource and DataSource
-	// implementations can then make calls using this client.
-	//
-	// TODO: If appropriate, implement upstream provider SDK or HTTP client.
 	client stream.Client
 
 	// configured is set to true at the end of the Configure method.
@@ -69,14 +64,23 @@ func (p *provider) Configure(ctx context.Context, req tfsdk.ConfigureProviderReq
 		return
 	}
 
-	// If the upstream provider SDK or HTTP client requires configuration, such
-	// as authentication or logging, this is a great opportunity to do so.
+	tflog.Debug(ctx, "Creating GetStream.io client...")
+	tflog.Trace(ctx, "ApiKey: "+data.ApiKey.Value)
+	tflog.Trace(ctx, "ApiSecret: "+data.ApiSecret.Value)
 	client, err := stream.NewClient(data.ApiKey.Value, data.ApiSecret.Value)
 	if err != nil {
+		resp.Diagnostics.Append(diag.NewErrorDiagnostic("Error during the creation of the GetStream.io client.", err.Error()))
 		tflog.Error(ctx, err.Error())
+		return
 	}
-	p.client = *client
+	_, err = client.GetAppConfig(ctx)
+	if err != nil {
+		resp.Diagnostics.Append(diag.NewErrorDiagnostic("Invalid config for GetStream.io.", err.Error()))
+		tflog.Error(ctx, err.Error())
+		return
+	}
 
+	p.client = *client
 	p.configured = true
 }
 
