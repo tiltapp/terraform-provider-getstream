@@ -2,7 +2,7 @@ package provider
 
 import (
 	"context"
-	stream "github.com/GetStream/stream-chat-go/v5"
+	stream "github.com/GetStream/stream-chat-go/v6"
 	"github.com/dcarbone/terraform-plugin-framework-utils/validation"
 	"github.com/hashicorp/terraform-plugin-framework/diag"
 	"github.com/hashicorp/terraform-plugin-framework/tfsdk"
@@ -89,9 +89,9 @@ func (r sqsResource) Create(ctx context.Context, req tfsdk.CreateResourceRequest
 	tflog.Trace(ctx, "SecretKey: "+data.SqsSecretKey.Value)
 	// set your sqsResource queue details
 	settings := &stream.AppSettings{
-		SqsURL:    data.SqsUrl.Value,
-		SqsKey:    data.SqsAccessKey.Value,
-		SqsSecret: data.SqsSecretKey.Value,
+		SqsURL:    &data.SqsUrl.Value,
+		SqsKey:    &data.SqsAccessKey.Value,
+		SqsSecret: &data.SqsSecretKey.Value,
 	}
 	_, err := r.provider.client.UpdateAppSettings(ctx, settings)
 	if err != nil {
@@ -136,9 +136,9 @@ func (r sqsResource) Update(ctx context.Context, req tfsdk.UpdateResourceRequest
 	tflog.Trace(ctx, "AccessKey: "+data.SqsAccessKey.Value)
 	tflog.Trace(ctx, "SecretKey: "+data.SqsSecretKey.Value)
 	settings := &stream.AppSettings{
-		SqsURL:    data.SqsUrl.Value,
-		SqsKey:    data.SqsAccessKey.Value,
-		SqsSecret: data.SqsSecretKey.Value,
+		SqsURL:    &data.SqsUrl.Value,
+		SqsKey:    &data.SqsAccessKey.Value,
+		SqsSecret: &data.SqsSecretKey.Value,
 	}
 	_, err := r.provider.client.UpdateAppSettings(ctx, settings)
 	if err != nil {
@@ -162,12 +162,16 @@ func (r sqsResource) Delete(ctx context.Context, req tfsdk.DeleteResourceRequest
 		return
 	}
 
+	data.SqsUrl.Value = ""
+	data.SqsAccessKey.Value = ""
+	data.SqsSecretKey.Value = ""
+
 	// set your sqsResource queue details
 	tflog.Debug(ctx, "Deleting the sqs link on the GetStream.io...")
 	settings := &stream.AppSettings{
-		SqsURL:    " ",
-		SqsKey:    " ",
-		SqsSecret: " ",
+		SqsURL:    &data.SqsUrl.Value,
+		SqsKey:    &data.SqsAccessKey.Value,
+		SqsSecret: &data.SqsSecretKey.Value,
 	}
 	_, err := r.provider.client.UpdateAppSettings(ctx, settings)
 	if err != nil {

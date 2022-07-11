@@ -3,7 +3,7 @@ package provider
 import (
 	"context"
 	"fmt"
-	stream "github.com/GetStream/stream-chat-go/v5"
+	stream "github.com/GetStream/stream-chat-go/v6"
 	"github.com/hashicorp/terraform-plugin-framework/diag"
 	"github.com/hashicorp/terraform-plugin-framework/tfsdk"
 	"github.com/hashicorp/terraform-plugin-framework/types"
@@ -73,7 +73,7 @@ func (p *provider) Configure(ctx context.Context, req tfsdk.ConfigureProviderReq
 		tflog.Error(ctx, err.Error())
 		return
 	}
-	_, err = client.GetAppConfig(ctx)
+	_, err = client.GetAppSettings(ctx)
 	if err != nil {
 		resp.Diagnostics.Append(diag.NewErrorDiagnostic("Invalid config for GetStream.io.", err.Error()))
 		tflog.Error(ctx, err.Error())
