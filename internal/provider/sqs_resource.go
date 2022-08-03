@@ -101,7 +101,7 @@ func (r sqsResource) Create(ctx context.Context, req tfsdk.CreateResourceRequest
 	}
 	tflog.Debug(ctx, "SQS link on the GetStream.io created.")
 
-	data.Id = types.String{Value: "getstreamio-sqs-1"}
+	data.Id = types.String{Value: "getstream-sqs-1"}
 	diags.Append(resp.State.Set(ctx, &data)...)
 	resp.Diagnostics.Append(diags...)
 }

@@ -1,12 +1,34 @@
-# Terraform Provider for GetStream.io
-https://registry.terraform.io/providers/talesporto/getstreamio/
+# Terraform Provider for [GetStream](getstream.io)
 
-## Requirements
+- Link to the provider: https://registry.terraform.io/providers/tiltapp/getstream
+- Link to the documentation: https://registry.terraform.io/providers/tiltapp/getstream/latest/docs
+
+## Using the provider
+
+```yaml
+provider "getstream" {
+  # example configuration here
+  api_key    = "key"
+  api_secret = "secret"
+}
+
+resource "getstream_sqs" "example" {
+  sqs_access_key = "some-value"
+  sqs_secret_key = "some-value"
+  sqs_url        = "some-value"
+}
+```
+
+Go to terraform [documentation](https://registry.terraform.io/providers/tiltapp/getstream/latest/docs) to get more details.
+
+---
+
+### Requirements
 
 - [Terraform](https://www.terraform.io/downloads.html) >= 1.0
 - [Go](https://golang.org/doc/install) >= 1.17
 
-## Building The Provider
+### Building The Provider
 
 1. Clone the repository
 1. Enter the repository directory
@@ -16,7 +38,7 @@ https://registry.terraform.io/providers/talesporto/getstreamio/
 go install
 ```
 
-## Adding Dependencies
+### Adding Dependencies
 
 This provider uses [Go modules](https://github.com/golang/go/wiki/Modules).
 Please see the Go documentation for the most up to date information about using Go modules.
@@ -29,10 +51,6 @@ go mod tidy
 ```
 
 Then commit the changes to `go.mod` and `go.sum`.
-
-## Using the provider
-
-Fill this in for each provider
 
 ## Developing the Provider
 

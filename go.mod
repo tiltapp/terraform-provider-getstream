@@ -1,4 +1,4 @@
-module github.com/hashicorp/terraform-provider-getstreamio
+module github.com/hashicorp/terraform-provider-getstream
 
 go 1.17
 
